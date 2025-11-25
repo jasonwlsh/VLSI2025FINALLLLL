@@ -5,9 +5,9 @@ period:1.6n
 
 mosfet:582
 
-**增加兩個功能 A+1 A==B**
+**增加兩個功能 A-1 A==B**
 
-A+1用現有incrementer去改
+A-1用現有incrementer去改
 
 新架構：
 
