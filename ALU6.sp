@@ -61,7 +61,7 @@ C6 OUT6 GND load
 
 ***** you can modify period here, remember this period need to match the period in the input.vec ****
 ***** OUT0~OUT6 should be correct before 0.5*period                                              ****
-.param period = 1.6n
+.param period = 1.5n
 ***-----------------------***
 ***      parameters       ***
 ***-----------------------***
@@ -225,7 +225,8 @@ Xfa5 a5 b5 c5 s5 cout VDD GND FA
 
 *** 6-bit Ripple Carry Incrementer/Decrementer ***
 .subckt RCI6 a0 a1 a2 a3 a4 a5 s0 s1 s2 s3 s4 s5 cout SUB1 VDD GND
-Xinc0 a0 VDD s0 c1 SUB1 VDD GND INCRE
+Xinv0 a0 s0 VDD GND INV
+Xxor SUB1 a0 c1 VDD GND XOR2
 Xinc1 a1 c1 s1 c2 SUB1 VDD GND INCRE
 Xinc2 a2 c2 s2 c3 SUB1 VDD GND INCRE
 Xinc3 a3 c3 s3 c4 SUB1 VDD GND INCRE
