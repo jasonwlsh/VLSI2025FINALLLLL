@@ -61,7 +61,7 @@ C6 OUT6 GND load
 
 ***** you can modify period here, remember this period need to match the period in the input.vec ****
 ***** OUT0~OUT6 should be correct before 0.5*period                                              ****
-.param period = 1.5n
+.param period = 1.4n
 ***-----------------------***
 ***      parameters       ***
 ***-----------------------***
@@ -179,6 +179,13 @@ Xmux2 m0_out m1_out sel2 sel2_ out VDD GND MUX2
 Xmux0 in0 in1 in2 in3 sel0 sel1 sel0_ sel1_ m0_out VDD GND MUX4
 Xmux1 in4 in6 sel1 sel1_ m1_out VDD GND MUX2
 Xmux2 m0_out m1_out sel2 sel2_ out VDD GND MUX2
+.ends
+
+*** 8-to-1 Multiplexer (for MSB) (port: GND GND GND GND add_cout add_cout_ add_cout_1 add_cout_1) ***
+.subckt MUX8_MSB in0 in4 in5 in6 sel0 sel1 sel2 sel0_ sel1_ sel2_ out VDD GND
+Xmux1 in4 in5 sel0 sel0_ out1 VDD GND MUX2
+Xumx2 out1 in6 sel1 sel1_ m1_out VDD GND MUX2
+Xmux3 in0 m1_out sel2 sel2_ out VDD GND MUX2
 .ends
 
 
@@ -353,14 +360,16 @@ Xout_mux3 OR3 AND3 XOR3 GND ADD3 ADD3 ADD3_1 ADD3_1
 +SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT3 VDD GND MUX8B
 * Bit 4
 Xout_mux4 OR4 AND4 XOR4 GND ADD4 ADD4 ADD4_1 ADD4_1
-+SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT4 VDD GND MUX8B
++SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT4_t VDD GND MUX8B
+Xbuf2 OUT4_t OUT4 VDD GND BUF
 * Bit 5
 Xout_mux5 OR5 AND5 XOR5 GND ADD5 ADD5 ADD5_1 ADD5_1
-+SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT5 VDD GND MUX8B
++SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT5_t VDD GND MUX8B
+Xbuf1 OUT5_t OUT5 VDD GND BUF
 
 *** Output Selection for bit 6 (Carry/Sign) ***
-Xout_mux6 GND GND GND GND add_cout add_cout_ add_cout_1 add_cout_1 \
-     SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT6_t VDD GND MUX8
+Xout_mux6 GND add_cout add_cout_ add_cout_1 \
+     SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT6_t VDD GND MUX8_MSB
 Xbuf OUT6_t OUT6 VDD GND BUF
 .ends
 
