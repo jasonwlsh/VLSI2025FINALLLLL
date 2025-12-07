@@ -35,12 +35,12 @@ Vd1 VDD GND supply
 ***-----------------------***
 ***       simulation      ***
 ***-----------------------***
-.tran 0.005n 'period*100'
+.tran 0.005n 'period*401'
 
 ***-----------------------***
 ***      measurement      ***
 ***-----------------------***
-.meas tran Iavg avg I(Vd1) from=0ns to='period*100'
+.meas tran Iavg avg I(Vd1) from=0ns to='period*401'
 .meas Pavg param='abs(Iavg)*supply'
 
 ***-----------------------***
@@ -61,11 +61,11 @@ C6 OUT6 GND load
 
 ***** you can modify period here, remember this period need to match the period in the input.vec ****
 ***** OUT0~OUT6 should be correct before 0.5*period                                              ****
-.param period = 1.4n
+.param period = 1.32n
 ***-----------------------***
 ***      parameters       ***
 ***-----------------------***
-.param wp=0.24u
+.param wp=0.34u
 .param wn=0.24u
 .param l_18=0.18u
 .param GND=0
@@ -81,7 +81,7 @@ Vcin C0 0 0
 
 *** Inverter ***
 .subckt INV in1 out VDD GND
-Mp1 out in1 VDD VDD P_18_G2 w=wp l=l_18
+Mp1 out in1 VDD VDD P_18_G2 w=0.34u l=l_18
 Mn1 out in1 GND GND N_18_G2 w=wn l=l_18
 .ends
 
@@ -89,6 +89,11 @@ Mn1 out in1 GND GND N_18_G2 w=wn l=l_18
 .subckt TRAN en en_bar d out VDD GND
 Mn out en d GND N_18_G2 w=wn l=l_18
 Mp out en_bar d VDD P_18_G2 w=wp l=l_18
+.ends
+
+.subckt PASS en en_bar d out VDD GND
+Mn out en d GND N_18_G2 w=wn l=l_18
+//Mp out en_bar d VDD P_18_G2 w=wp l=l_18
 .ends
 
 *** 2-input NOR Gate ***
@@ -128,6 +133,17 @@ mn5 out in5 GND GND N_18_G2 w=wn l=l_18
 mn6 out in6 GND GND N_18_G2 w=wn l=l_18
 .ends NOR6
 
+.subckt Pseudo_NOR6 in1 in2 in3 in4 in5 in6 out VDD GND
+mp1 out GND VDD VDD P_18_G2 w=wp l=l_18
+
+mn1 out in1 GND GND N_18_G2 w=wp l=l_18
+mn2 out in2 GND GND N_18_G2 w=wp l=l_18
+mn3 out in3 GND GND N_18_G2 w=wp l=l_18
+mn4 out in4 GND GND N_18_G2 w=wp l=l_18
+mn5 out in5 GND GND N_18_G2 w=wp l=l_18
+mn6 out in6 GND GND N_18_G2 w=wp l=l_18
+.ends NOR6
+
 *** XOR2 ***
 .subckt XOR2 a b y VDD GND
 Xinv_a a a_bar VDD GND INV
@@ -156,8 +172,8 @@ Xinv2 node_int out VDD GND INV
 
 *** 2-to-1 Multiplexer ***
 .SUBCKT MUX2 A B S S_bar Vout VDD GND
-Xtg_B S S_bar B Vout VDD GND TRAN  
-Xtg_A S_bar S A Vout VDD GND TRAN  
+Xtg_B S S_bar B Vout VDD GND PASS
+Xtg_A S_bar S A Vout VDD GND PASS
 .ends
 
 *** 4-to-1 Multiplexer ***
@@ -290,7 +306,7 @@ Xxor4 a4 b4 xor4 VDD GND XOR2
 Xxor5 a5 b5 xor5 VDD GND XOR2
 
 * EQ operation (NOR6)
-Xeq xor0 xor1 xor2 xor3 xor4 xor5 EQ VDD GND NOR6
+Xeq xor0 xor1 xor2 xor3 xor4 xor5 EQ VDD GND Pseudo_NOR6
 .ends
 
 *** 6-bit Arithmetic Unit (ADD/SUB) ***
@@ -298,13 +314,13 @@ Xeq xor0 xor1 xor2 xor3 xor4 xor5 EQ VDD GND NOR6
                    s0 s1 s2 s3 s4 s5 cout VDD GND
 
 * B_eff = B xor SUB (if sub then invert b)
-Xinv SUB SUB_ VDD GND INV
-Xbx0 b0 SUB SUB_ b0f VDD GND FASTXOR2
-Xbx1 b1 SUB SUB_ b1f VDD GND FASTXOR2
-Xbx2 b2 SUB SUB_ b2f VDD GND FASTXOR2
-Xbx3 b3 SUB SUB_ b3f VDD GND FASTXOR2
-Xbx4 b4 SUB SUB_ b4f VDD GND FASTXOR2
-Xbx5 b5 SUB SUB_ b5f VDD GND FASTXOR2
+//Xinv SUB SUB_ VDD GND INV
+Xbx0 b0 SUB b0f VDD GND XOR2
+Xbx1 b1 SUB b1f VDD GND XOR2
+Xbx2 b2 SUB b2f VDD GND XOR2
+Xbx3 b3 SUB b3f VDD GND XOR2
+Xbx4 b4 SUB b4f VDD GND XOR2
+Xbx5 b5 SUB b5f VDD GND XOR2
 
 * 6-bit adder
 Xadder a0 a1 a2 a3 a4 a5 b0f b1f b2f b3f b4f b5f SUB \
@@ -354,14 +370,14 @@ Xout_mux1 OR1 AND1 XOR1 GND ADD1 ADD1 ADD1_1 ADD1_1
 +SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT1 VDD GND MUX8B
 * Bit 2
 Xout_mux2 OR2 AND2 XOR2 GND ADD2 ADD2 ADD2_1 ADD2_1
-+SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT2 VDD GND MUX8B
++SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT2_t VDD GND MUX8B
+Xbuf3 OUT2_t OUT2 VDD GND BUF
 * Bit 3
 Xout_mux3 OR3 AND3 XOR3 GND ADD3 ADD3 ADD3_1 ADD3_1
 +SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT3 VDD GND MUX8B
 * Bit 4
 Xout_mux4 OR4 AND4 XOR4 GND ADD4 ADD4 ADD4_1 ADD4_1
-+SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT4_t VDD GND MUX8B
-Xbuf2 OUT4_t OUT4 VDD GND BUF
++SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT4 VDD GND MUX8B
 * Bit 5
 Xout_mux5 OR5 AND5 XOR5 GND ADD5 ADD5 ADD5_1 ADD5_1
 +SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT5_t VDD GND MUX8B
