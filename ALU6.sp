@@ -61,7 +61,7 @@ C6 OUT6 GND load
 
 ***** you can modify period here, remember this period need to match the period in the input.vec ****
 ***** OUT0~OUT6 should be correct before 0.5*period                                              ****
-.param period = 1.32n
+.param period = 1.26n
 ***-----------------------***
 ***      parameters       ***
 ***-----------------------***
@@ -99,8 +99,9 @@ Mn out en d GND N_18_G2 w=wn l=l_18
 *** 2-input NOR Gate ***
 .subckt NOR2 in1 in2 out VDD GND
 * PMOS (Pull-up Network: Series)
-mp1 node1 in1 VDD VDD P_18_G2 w=wp l=l_18
-mp2 out in2 node1 VDD P_18_G2 w=wp l=l_18
+//mp1 node1 in1 VDD VDD P_18_G2 w=wp l=l_18
+//mp2 out in2 node1 VDD P_18_G2 w=wp l=l_18
+mp1 out GND VDD VDD P_18_G2 w=wp l=l_18
 * NMOS (Pull-down Network: Parallel)
 mn1 out in1 GND GND N_18_G2 w=wn l=l_18
 mn2 out in2 GND GND N_18_G2 w=wn l=l_18
@@ -117,21 +118,6 @@ mn2 out in2 node1 GND N_18_G2 w=wn l=l_18
 .ends
 
 *** 6-input NOR Gate (For EQ check) ***
-.subckt NOR6 in1 in2 in3 in4 in5 in6 out VDD GND
-mp1 node1 in1 VDD VDD P_18_G2 w=wp l=l_18
-mp2 node2 in2 node1 VDD P_18_G2 w=wp l=l_18
-mp3 node3 in3 node2 VDD P_18_G2 w=wp l=l_18
-mp4 node4 in4 node3 VDD P_18_G2 w=wp l=l_18
-mp5 node5 in5 node4 VDD P_18_G2 w=wp l=l_18
-mp6 out  in6 node5 VDD P_18_G2 w=wp l=l_18
-
-mn1 out in1 GND GND N_18_G2 w=wn l=l_18
-mn2 out in2 GND GND N_18_G2 w=wn l=l_18
-mn3 out in3 GND GND N_18_G2 w=wn l=l_18
-mn4 out in4 GND GND N_18_G2 w=wn l=l_18
-mn5 out in5 GND GND N_18_G2 w=wn l=l_18
-mn6 out in6 GND GND N_18_G2 w=wn l=l_18
-.ends NOR6
 
 .subckt Pseudo_NOR6 in1 in2 in3 in4 in5 in6 out VDD GND
 mp1 out GND VDD VDD P_18_G2 w=wp l=l_18
