@@ -1,3 +1,4 @@
+
 ***------------------------------------***
 ***          VLSI Intro 2025           ***
 ***           CMOS 6-bit ALU           ***
@@ -61,12 +62,12 @@ C6 OUT6 GND load
 
 ***** you can modify period here, remember this period need to match the period in the input.vec ****
 ***** OUT0~OUT6 should be correct before 0.5*period                                              ****
-.param period = 1.26n
+.param period = 1.32n
 ***-----------------------***
 ***      parameters       ***
 ***-----------------------***
-.param wp=0.34u
-.param wn=0.24u
+.param wp=0.44u
+.param wn=0.44u
 .param l_18=0.18u
 .param GND=0
 .param VDD=1.8
@@ -81,7 +82,7 @@ Vcin C0 0 0
 
 *** Inverter ***
 .subckt INV in1 out VDD GND
-Mp1 out in1 VDD VDD P_18_G2 w=0.34u l=l_18
+Mp1 out in1 VDD VDD P_18_G2 w=wp l=l_18
 Mn1 out in1 GND GND N_18_G2 w=wn l=l_18
 .ends
 
@@ -91,16 +92,9 @@ Mn out en d GND N_18_G2 w=wn l=l_18
 Mp out en_bar d VDD P_18_G2 w=wp l=l_18
 .ends
 
-.subckt PASS en en_bar d out VDD GND
-Mn out en d GND N_18_G2 w=wn l=l_18
-//Mp out en_bar d VDD P_18_G2 w=wp l=l_18
-.ends
-
 *** 2-input NOR Gate ***
 .subckt NOR2 in1 in2 out VDD GND
 * PMOS (Pull-up Network: Series)
-//mp1 node1 in1 VDD VDD P_18_G2 w=wp l=l_18
-//mp2 out in2 node1 VDD P_18_G2 w=wp l=l_18
 mp1 out GND VDD VDD P_18_G2 w=wp l=l_18
 * NMOS (Pull-down Network: Parallel)
 mn1 out in1 GND GND N_18_G2 w=wn l=l_18
@@ -116,8 +110,6 @@ mp2 out in2 VDD VDD P_18_G2 w=wp l=l_18
 mn1 node1 in1 GND GND N_18_G2 w=wn l=l_18
 mn2 out in2 node1 GND N_18_G2 w=wn l=l_18
 .ends
-
-*** 6-input NOR Gate (For EQ check) ***
 
 .subckt Pseudo_NOR6 in1 in2 in3 in4 in5 in6 out VDD GND
 mp1 out GND VDD VDD P_18_G2 w=wp l=l_18
@@ -138,12 +130,6 @@ Xtg1 b b_bar a_bar y VDD GND TRAN
 Xtg2 b_bar b a y VDD GND TRAN
 .ends
 
-*** FAST XOR2 (Optimized for Arithmetic) ***
-.subckt FASTXOR2 a b b_bar y VDD GND
-Xinv_a a a_bar VDD GND INV
-Xtg1 b b_bar a_bar y VDD GND TRAN
-Xtg2 b_bar b a y VDD GND TRAN
-.ends
 
 *** Buffer ***
 .subckt BUF in out VDD GND
@@ -158,14 +144,14 @@ Xinv2 node_int out VDD GND INV
 
 *** 2-to-1 Multiplexer ***
 .SUBCKT MUX2 A B S S_bar Vout VDD GND
-Xtg_B S S_bar B Vout VDD GND PASS
-Xtg_A S_bar S A Vout VDD GND PASS
+Xtg_B S S_bar B Vout VDD GND TRAN
+Xtg_A S_bar S A Vout VDD GND TRAN
 .ends
 
 *** 4-to-1 Multiplexer ***
 .subckt MUX4 in0 in1 in2 in3 sel0 sel1 sel0_ sel1_ out VDD GND
 Xmux0 in0 in1 sel0 sel0_ m0_out VDD GND MUX2
-Xmux1 in2 in3 sel0 sel0_ m1_out VDD GND MUX2  
+Xmux1 in2 in3 sel0 sel0_ m1_out VDD GND MUX2
 Xmux2 m0_out m1_out sel1 sel1_ out VDD GND MUX2
 .ends
 
@@ -226,7 +212,7 @@ Xxor1 A Cin Sum VDD GND XOR2
 .subckt RCA6 a0 a1 a2 a3 a4 a5 b0 b1 b2 b3 b4 b5 cin s0 s1 s2 s3 s4 s5 cout VDD GND
 Xfa0 a0 b0 cin s0 c1 VDD GND FA
 Xfa1 a1 b1 c1 s1 c2 VDD GND FA
-Xfa2 a2 b2 c2 s2 c3 VDD GND FA  
+Xfa2 a2 b2 c2 s2 c3 VDD GND FA
 Xfa3 a3 b3 c3 s3 c4 VDD GND FA
 Xfa4 a4 b4 c4 s4 c5 VDD GND FA
 Xfa5 a5 b5 c5 s5 cout VDD GND FA
@@ -251,7 +237,7 @@ Xinc5 a5 c5 s5 cout SUB1 VDD GND INCRE
 *** 6-bit Logic Operations Unit ***
 .subckt LOGIC_UNIT a0 a1 a2 a3 a4 a5 b0 b1 b2 b3 b4 b5
 +                  or0 or1 or2 or3 or4 or5
-+                  and0 and1 and2 and3 and4 and5  
++                  and0 and1 and2 and3 and4 and5
 +                  xor0 xor1 xor2 xor3 xor4 xor5
 +                  EQ VDD GND
 
@@ -283,7 +269,7 @@ Xinv5 and4_ and4 VDD GND INV
 Xand5 a5 b5 and5_ VDD GND NAND2
 Xinv6 and5_ and5 VDD GND INV
 
-* XOR operations  
+* XOR operations
 Xxor0 a0 b0 xor0 VDD GND XOR2
 Xxor1 a1 b1 xor1 VDD GND XOR2
 Xxor2 a2 b2 xor2 VDD GND XOR2
@@ -300,7 +286,7 @@ Xeq xor0 xor1 xor2 xor3 xor4 xor5 EQ VDD GND Pseudo_NOR6
                    s0 s1 s2 s3 s4 s5 cout VDD GND
 
 * B_eff = B xor SUB (if sub then invert b)
-//Xinv SUB SUB_ VDD GND INV
+
 Xbx0 b0 SUB b0f VDD GND XOR2
 Xbx1 b1 SUB b1f VDD GND XOR2
 Xbx2 b2 SUB b2f VDD GND XOR2
@@ -335,7 +321,7 @@ XnS0 SEL0 SEL0_ VDD GND INV
 *** Logic Unit for bits 0-5 ***
 Xlogic A0 A1 A2 A3 A4 A5 B0 B1 B2 B3 B4 B5
 +       OR0 OR1 OR2 OR3 OR4 OR5
-+       AND0 AND1 AND2 AND3 AND4 AND5  
++       AND0 AND1 AND2 AND3 AND4 AND5
 +       XOR0 XOR1 XOR2 XOR3 XOR4 XOR5 EQ VDD GND LOGIC_UNIT
 
 *** Arithmetic Unit (ADD/SUB) ***
@@ -357,7 +343,7 @@ Xout_mux1 OR1 AND1 XOR1 GND ADD1 ADD1 ADD1_1 ADD1_1
 * Bit 2
 Xout_mux2 OR2 AND2 XOR2 GND ADD2 ADD2 ADD2_1 ADD2_1
 +SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT2_t VDD GND MUX8B
-Xbuf3 OUT2_t OUT2 VDD GND BUF
+Xbuf2 OUT2_t OUT2 VDD GND BUF
 * Bit 3
 Xout_mux3 OR3 AND3 XOR3 GND ADD3 ADD3 ADD3_1 ADD3_1
 +SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT3 VDD GND MUX8B
@@ -367,12 +353,12 @@ Xout_mux4 OR4 AND4 XOR4 GND ADD4 ADD4 ADD4_1 ADD4_1
 * Bit 5
 Xout_mux5 OR5 AND5 XOR5 GND ADD5 ADD5 ADD5_1 ADD5_1
 +SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT5_t VDD GND MUX8B
-Xbuf1 OUT5_t OUT5 VDD GND BUF
+Xbuf5 OUT5_t OUT5 VDD GND BUF
 
 *** Output Selection for bit 6 (Carry/Sign) ***
 Xout_mux6 GND add_cout add_cout_ add_cout_1 \
      SEL0 SEL1 SEL2 SEL0_ SEL1_ SEL2_ OUT6_t VDD GND MUX8_MSB
-Xbuf OUT6_t OUT6 VDD GND BUF
+Xbuf6 OUT6_t OUT6 VDD GND BUF
 .ends
 
 *** Execution ***
@@ -380,3 +366,4 @@ Xalu A5 A4 A3 A2 A1 A0 B5 B4 B3 B2 B1 B0 SEL2 SEL1 SEL0
 +OUT6 OUT5 OUT4 OUT3 OUT2 OUT1 OUT0 VDD GND ALU6
 
 .end
+
