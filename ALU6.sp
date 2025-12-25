@@ -1,4 +1,3 @@
-
 ***------------------------------------***
 ***          VLSI Intro 2025           ***
 ***           CMOS 6-bit ALU           ***
@@ -124,11 +123,25 @@ mn6 out in6 GND GND N_18_G2 w=wp l=l_18
 
 *** XOR2 ***
 .subckt XOR2 a b y VDD GND
+
 Xinv_a a a_bar VDD GND INV
 Xinv_b b b_bar VDD GND INV
 Xtg1 b b_bar a_bar y VDD GND TRAN
 Xtg2 b_bar b a y VDD GND TRAN
 .ends
+
+* XOR Gate using Transmission Gates
+.subckt NEWXOR a b b_bar y vdd vss
+
+mp1 y a b vdd P_18_G2 l=l_18 w=wp
+mn1 y a b_bar vss N_18_G2 l=l_18 w=wn
+
+mp2 a b y vdd P_18_G2 l=l_18 w=wp
+mn2 a b_bar y vss N_18_G2 l=l_18 w=wn
+
+.ends
+
+
 
 
 *** Buffer ***
@@ -196,11 +209,12 @@ Xtran6 N1 N1_bar Cin Cout VDD GND TRAN
 .ends
 
 *** 1-bit Incrementer/Decrementer Cell ***
-.subckt INCRE A Cin Sum Cout SUB1 VDD GND
-Xxor0 A SUB1 n1 VDD GND XOR2
+.subckt INCRE A Cin Sum Cout SUB VDD GND
+Xinv0 A A_bar VDD GND INV
+Xxor0 SUB A A_bar n1 VDD GND NEWXOR
 Xnand Cin n1 Cout_bar VDD GND NAND2
 Xinv1 Cout_bar Cout VDD GND INV
-Xxor1 A Cin Sum VDD GND XOR2
+Xxor1 Cin A A_bar Sum VDD GND NEWXOR
 .ends
 
 
@@ -366,4 +380,5 @@ Xalu A5 A4 A3 A2 A1 A0 B5 B4 B3 B2 B1 B0 SEL2 SEL1 SEL0
 +OUT6 OUT5 OUT4 OUT3 OUT2 OUT1 OUT0 VDD GND ALU6
 
 .end
+
 
