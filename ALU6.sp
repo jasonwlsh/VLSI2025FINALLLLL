@@ -130,19 +130,13 @@ Xtg1 b b_bar a_bar y VDD GND TRAN
 Xtg2 b_bar b a y VDD GND TRAN
 .ends
 
-* XOR Gate using Transmission Gates
+* XOR Gate using Transmission Gates (4T ver.)
 .subckt NEWXOR a b b_bar y vdd vss
-
 mp1 y a b vdd P_18_G2 l=l_18 w=wp
 mn1 y a b_bar vss N_18_G2 l=l_18 w=wn
-
 mp2 a b y vdd P_18_G2 l=l_18 w=wp
 mn2 a b_bar y vss N_18_G2 l=l_18 w=wn
-
 .ends
-
-
-
 
 *** Buffer ***
 .subckt BUF in out VDD GND
